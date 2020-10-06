@@ -37,7 +37,7 @@ import java.util.List;
  * @see "OpenID Connect Core ID Token Validation, Section 3.1.3.7
  * <http://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation>"
  */
-class IdToken {
+public class IdToken {
 
     private static final String KEY_ISSUER = "iss";
     private static final String KEY_SUBJECT = "sub";
@@ -47,6 +47,8 @@ class IdToken {
     private static final String KEY_NONCE = "nonce";
     private static final Long MILLIS_PER_SECOND = 1000L;
     private static final Long TEN_MINUTES_IN_SECONDS = 600L;
+
+    private static Boolean isIssuerHttpsCheckEnabled = true;
 
     public final String issuer;
     public final String subject;
@@ -109,6 +111,10 @@ class IdToken {
         );
     }
 
+    public static void setIssuerHttpsCheckEnabled(Boolean enabled) {
+        isIssuerHttpsCheckEnabled = enabled;
+    }
+
     void validate(@NonNull TokenRequest tokenRequest, Clock clock) throws AuthorizationException {
         // OpenID Connect Core Section 3.1.3.7. rule #1
         // Not enforced: AppAuth does not support JWT encryption.
@@ -129,7 +135,7 @@ class IdToken {
             // components.
             Uri issuerUri = Uri.parse(this.issuer);
 
-            if (!issuerUri.getScheme().equals("https")) {
+            if (!issuerUri.getScheme().equals("https") && isIssuerHttpsCheckEnabled) {
                 throw AuthorizationException.fromTemplate(GeneralErrors.ID_TOKEN_VALIDATION_ERROR,
                     new IdTokenException("Issuer must be an https URL"));
             }
