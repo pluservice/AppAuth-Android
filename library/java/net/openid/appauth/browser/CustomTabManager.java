@@ -81,7 +81,10 @@ public class CustomTabManager {
             public void onCustomTabsServiceConnected(ComponentName componentName,
                                                      CustomTabsClient customTabsClient) {
                 Logger.debug("CustomTabsService is connected");
-                customTabsClient.warmup(0);
+                
+                // https://github.com/openid/AppAuth-Android/issues/324
+                // customTabsClient.warmup(0);
+                
                 setClient(customTabsClient);
             }
 
